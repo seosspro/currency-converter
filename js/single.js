@@ -1,6 +1,6 @@
 import {renderCurrencyItem} from "./markups.js";
 import {state} from "./state.js";
-import {variables}from "./variables.js";
+import {variables} from "./variables.js";
 
 const {success, currentCurrency, currentCurrencyList} = variables;
 
@@ -44,3 +44,51 @@ export const fetchLatest = async () => {
         console.log(err);
     }
 };
+
+const changeCurrency = () => {
+    currentCurrency.parentElement.classList.add('active')
+}
+
+const removeCurrency = (target) => {
+    const parent = target.parentElement.parentElement
+    const {item} = parent.dataset
+
+    if (!item) return
+
+    const element = document.querySelector(`[data-item='${item}']`)
+    element.remove()
+}
+
+export const handleActionClick = ({target}) => {
+    const {action} = target.dataset
+
+    if (!action) return
+
+    const {actions: {remove}} = state
+    action === remove ? removeCurrency(target) : changeCurrency()
+}
+
+export const handleSingleSelectChange = ({target}) => {
+    target.parentElement.classList.remove('active')
+    state.currency = {...state.currency, code: target.value}
+    fetchLatest()
+    target.value = ''
+}
+
+export const addCurrency = ({currentTarget}) => {
+    currentTarget.parentElement.classList.add('active')
+}
+
+export const handleAddSelectChange = ({target}) => {
+    const {currency: {conversion_rates: rates, base_code: baseCode}} = state
+    const currency = Object.entries(rates).find(([key]) => (
+            key === target.value && key !== baseCode
+    ))
+
+    if (currency) {
+        const [code, amount] = currency
+        insertCurrency({...state.currency, code, amount})
+        target.parentElement.classList.remove('active')
+        target.value = ''
+    }
+}
