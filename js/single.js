@@ -87,7 +87,7 @@ export const handleAddSelectChange = ({target}) => {
 
     if (currency) {
         const [code, amount] = currency
-        insertCurrency({...state.currency, code, amount})
+        insertCurrency({...state.currency, code, rate: amount})
         target.parentElement.classList.remove('active')
         target.value = ''
     }
